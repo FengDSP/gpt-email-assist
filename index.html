@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Input Page</title>
+  </head>
+  <body>
+    <h1>Input Page</h1>
+    <label for="inputBox">Enter your text:</label>
+    <br>
+    <textarea id="inputBox" rows="10" cols="50"></textarea>
+    <br>
+    <button id="yesBtn" onclick="handleYes()">Yes</button>
+    <button id="noBtn" onclick="handleNo()">No</button>
+    <button id="clarifyBtn" onclick="handleClarify()">Please clarify</button>
+    
+    <script>
+      function handleYes() {
+          var result = document.createElement("p");
+          result.innerHTML = "yes";
+          document.body.appendChild(result);
+      }
+
+      function handleNo() {
+        // Leave this function empty for further implementation
+      }
+
+      function handleClarify() {
+        // Leave this function empty for further implementation
+      }
+    </script>
+  </body>
+</html>
