@@ -86,12 +86,14 @@ Feng</textarea>
         <button id="yesBtn" onclick="handleYes()">Agree / Go ahead / Confirm</button> or
         <button id="noBtn" onclick="handleNo()">Disagree / Say no</button> or
         <button id="clarifyBtn" onclick="handleClarify()">Clarify / Ask Questions</button>
-        
+        <div id="spinner" style="display: none;">
+          <img src="static/spinner.gif" alt="Loading..."/>
+        </div>
         <div class="response-box" style="display:none">
             <label>Model:
                 <span id="responseModel"></span><br>
-                <span id="responseAction"></span><br>
                 <span id="responseTime"></span>
+                <span id="responseAction"></span><br>
             </label>
             <pre id="response"></pre>
         </div>
@@ -118,7 +120,7 @@ Feng</textarea>
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                         var response = JSON.parse(xhr.responseText);
-                        handleResponse(response.response, modelSelect, action);
+                        handleResponse(response, modelSelect, action);
                     }
                 };
                 xhr.send(JSON.stringify({
@@ -126,9 +128,10 @@ Feng</textarea>
                     "model" : modelSelect,
                     "action": action,
                 }));
+                showSpinner();
             }
             
-            function handleResponse(responseText, model = '', action = '') {
+            function handleResponse(responseJSON, model = '', action = '') {
                 var responseBox = document.querySelector('.response-box');
                 const newBox = responseBox.cloneNode(true);
                 const randomId = 'div-' + Math.random().toString(36).substr(2, 9);
@@ -143,8 +146,20 @@ Feng</textarea>
                 responseBox.style.display = 'block';
                 responseModel.innerText = model;
                 responseAction.innerText = action;
-                responseTime.innerText = new Date().toLocaleString('en-US', {timeZoneName: 'short'});
-                response.innerText = responseText.replace(/\n/g, '\r\n');
+                let nowTime = new Date().toLocaleString('en-US', {timeZoneName: 'short'})
+                responseTime.innerText = `${nowTime} (latency: ${responseJSON.latency_sec.toFixed(6)} secs)`;
+                response.innerText = responseJSON.response.replace(/\n/g, '\r\n');
+                hideSpinner();
+            }
+            
+            function showSpinner() {
+              var spinner = document.getElementById("spinner");
+              spinner.style.display = "block";
+            }
+
+            function hideSpinner() {
+              var spinner = document.getElementById("spinner");
+              spinner.style.display = "none";
             }
         </script>
     </body>

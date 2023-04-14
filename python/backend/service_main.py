@@ -1,5 +1,6 @@
 
 import sys
+import time
 
 from absl import flags
 from flask import Flask, request, jsonify, send_file
@@ -13,10 +14,6 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/')
-def index():
-    return send_file('../../index.html')
-
 complete_models = set([
     'text-davinci-003',
     'text-davinci-002',
@@ -27,11 +24,18 @@ def generate_response():
     email = request.json['email']
     action = request.json['action']
     model = request.json['model']
+
+    start_time = time.perf_counter()
     if model in complete_models:
         response = _call_complete(model, email, action)
     else:
         response = _call_chat(model, email, action)
-    return jsonify({'response': response})
+    end_time = time.perf_counter()
+
+    return jsonify({
+        'response': response,
+        'latency_sec': end_time - start_time,
+    })
 
 
 def _call_complete(model, email, action):
