@@ -2,47 +2,149 @@
 <html>
     <head>
         <meta charset="UTF-8">
-            <title>Input Page</title>
+        <title>LLM Email Auto Reply Demo</title>
+        <style>
+            .response-box {
+                border: 1pt solid lightgray;
+                padding: 10px;
+                margin-top: 10px;
+            }
+            
+            .response-box label {
+                font-weight: bold;
+            }
+            
+            .response-box pre {
+                white-space: pre-wrap;
+            }
+            
+            textarea {
+              color: grey;
+            }
+        </style>
     </head>
     <body>
-        <h1>Input Page</h1>
+        <h1>LLM Email Auto Reply Demo</h1>
+        
+        <label for="modelSelect">Select model:</label>
+        <select id="modelSelect">
+            <option value="gpt-3.5-turbo" selected>gpt-3.5-turbo</option>
+            <option value="gpt-4">gpt-4</option>
+            <option value="text-davinci-003">text-davinci-003</option>
+            <option value="text-davinci-002">text-davinci-002</option>
+        </select>
+        
+        <br><br>
+        
         <label for="inputBox">Copy your email thread here:</label>
         <br>
-        <textarea id="inputBox" rows="50" cols="60"></textarea>
+        <textarea id="inputBox" rows="50" cols="100">Yes, they still show end of April.
+
+Janelle Hudson | Trade Account Manager
+Phone: 408-200-0000  |  Mobile: 408-309-0000  |  Email: Janelle@airportappliance.com
+Days off:  Sunday & Monday.  Available by appointment in store.
+Visit us online at: www.airportappliance.com
+
+From: Feng Li &lt;fengxxxxx@gmail.com&gt;
+Sent: Wednesday, April 5, 2023 8:54 PM
+
+To: Janelle Hudson &lt;janelle@airportappliance.com&gt;
+Subject: Re: 22100004, 52140003 - LI - KITCHEN APPLIANCES
+
+
+Hi Janelle,
+
+Is my fridge on track to arrive in mid-April? Can't wait to have it installed :)
+
+Best regards,
+Feng Li
+
+On Mon, Feb 20, 2023 at 8:56 AM Janelle Hudson &lt;janelle@airportappliance.com&gt; wrote:
+You are the 1st on the list.  And we are looking at mid-April.
+
+Janelle Hudson | Trade Account Manager
+Phone: 408-200-0000  |  Mobile: 408-309-0000  |  Email: Janelle@airportappliance.com
+Days off:  Sunday & Monday.  Available by appointment in store.
+
+
+From: Feng Li &lt;fengxxxxx@gmail.com&gt;
+Sent: Monday, February 20, 2023 7:48 AM
+To: Janelle Hudson &lt;janelle@airportappliance.com&gt;
+Subject: Re: 22100004, 52140003 - LI - KITCHEN APPLIANCES
+
+ 
+Hi Janelle,
+
+Hope this email finds you well.
+
+Any update on our fridge? I can't believe that our remodel takes so long. It's finally close to finishing. It would be great if we can use our new fridge for the final inspection.
+
+Thanks,
+Feng</textarea>
         <br>
-        <button id="yesBtn" onclick="handleYes()">Yes</button>
-        <button id="noBtn" onclick="handleNo()">No</button>
-        <button id="clarifyBtn" onclick="handleClarify()">Please clarify</button>
+        <label for="modelSelect">Reply your email with:</label>
+        <button id="yesBtn" onclick="handleYes()">Agree / Go ahead / Confirm</button> or
+        <button id="noBtn" onclick="handleNo()">Disagree / Say no</button> or
+        <button id="clarifyBtn" onclick="handleClarify()">Clarify / Ask Questions</button>
+        
+        <div class="response-box" style="display:none">
+            <label>Model:
+                <span id="responseModel"></span><br>
+                <span id="responseAction"></span><br>
+                <span id="responseTime"></span>
+            </label>
+            <pre id="response"></pre>
+        </div>
         
         <script>
             function handleYes() {
-                var result = document.createElement("p");
-                result.innerHTML = "yes";
-                document.body.appendChild(result);
+                handleAction("agree / go ahead / confirm");
             }
-            
+
             function handleNo() {
+                handleAction("disagree / say no");
+            }
+
+            function handleClarify() {
+                handleAction("clarify / ask questions");
+            }
+
+            function handleAction(action) {
                 var inputText = document.getElementById("inputBox").value;
+                var modelSelect = document.getElementById("modelSelect").value;
                 var xhr = new XMLHttpRequest();
-                xhr.open("POST", "http://127.0.0.1:5000/api/gpt3", true);
+                xhr.open("POST", "http://127.0.0.1:5000/api/email-auto-reply", true);
                 xhr.setRequestHeader("Content-Type", "application/json");
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                         var response = JSON.parse(xhr.responseText);
-                        var result = document.createElement("p");
-                        result.innerHTML = response.response;
-                        document.body.appendChild(result);
+                        handleResponse(response.response, modelSelect, action);
                     }
                 };
                 xhr.send(JSON.stringify({
                     "email" : inputText,
-                    "model" : "gpt-3.5-turbo",
-                    "action": "don't agree",
+                    "model" : modelSelect,
+                    "action": action,
                 }));
             }
             
-            function handleClarify() {
-                // Leave this function empty for further implementation
+            function handleResponse(responseText, model = '', action = '') {
+                var responseBox = document.querySelector('.response-box');
+                const newBox = responseBox.cloneNode(true);
+                const randomId = 'div-' + Math.random().toString(36).substr(2, 9);
+                newBox.id = randomId;
+                responseBox.insertAdjacentElement('afterend', newBox);
+                
+                var responseModel = document.getElementById('responseModel');
+                var responseAction = document.getElementById('responseAction');
+                var responseTime = document.getElementById('responseTime');
+                var response = document.getElementById('response');
+                
+                responseBox.style.display = 'block';
+                responseModel.innerText = model;
+                responseAction.innerText = action;
+                responseTime.innerText = new Date().toLocaleString('en-US', {timeZoneName: 'short'});
+                response.innerText = responseText.replace(/\n/g, '\r\n');
             }
         </script>
     </body>

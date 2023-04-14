@@ -1,12 +1,17 @@
+
+import sys
+
+from absl import flags
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import openai
 
+flags.DEFINE_string('openai_api_key', None, 'Your OpenAI API key')
+
+
 app = Flask(__name__)
 CORS(app)
 
-
-openai.api_key = 'api key'
 
 @app.route('/')
 def index():
@@ -17,7 +22,7 @@ complete_models = set([
     'text-davinci-002',
 ])
 
-@app.route('/api/gpt3', methods=['POST'])
+@app.route('/api/email-auto-reply', methods=['POST'])
 def generate_response():
     email = request.json['email']
     action = request.json['action']
@@ -82,4 +87,8 @@ What can I reply if I {action}?
   
 
 if __name__ == '__main__':
+    flags.FLAGS(sys.argv)
+    if not flags.FLAGS.openai_api_key:
+        raise ValueError("Missing required argument: --openai_api_key")
+    openai.api_key = flags.FLAGS.openai_api_key
     app.run()
