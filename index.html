@@ -92,8 +92,8 @@ Feng</textarea>
         <div class="response-box" style="display:none">
             <label>Model:
                 <span id="responseModel"></span><br>
-                <span id="responseTime"></span>
-                <span id="responseAction"></span><br>
+                <span id="responseTime"></span><br>
+                <span id="responseAction"></span>
             </label>
             <pre id="response"></pre>
         </div>
@@ -115,7 +115,8 @@ Feng</textarea>
                 var inputText = document.getElementById("inputBox").value;
                 var modelSelect = document.getElementById("modelSelect").value;
                 var xhr = new XMLHttpRequest();
-                xhr.open("POST", "http://127.0.0.1:5000/api/email-auto-reply", true);
+                xhr.open("POST", "https://demobackend-ly4bgi2b5q-wl.a.run.app/api/email-auto-reply", true);
+<!--                xhr.open("POST", "http://127.0.0.1:3850/api/email-auto-reply", true);-->
                 xhr.setRequestHeader("Content-Type", "application/json");
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {

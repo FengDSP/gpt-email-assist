@@ -1,8 +1,10 @@
 
+import os
 import sys
 import time
 
 from absl import flags
+from absl import logging
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import openai
@@ -92,7 +94,12 @@ What can I reply if I {action}?
 
 if __name__ == '__main__':
     flags.FLAGS(sys.argv)
-    if not flags.FLAGS.openai_api_key:
-        raise ValueError("Missing required argument: --openai_api_key")
-    openai.api_key = flags.FLAGS.openai_api_key
-    app.run()
+#    env_openai_api_key = os.environ.get('openai_api_key')
+    if flags.FLAGS.openai_api_key:
+        openai.api_key = flags.FLAGS.openai_api_key
+        logging.info("Set openai.api_key.")
+#    elif env_openai_api_key:
+#        openai.api_key = env_openai_api_key
+#    else:
+#        raise ValueError("Missing required argument: --openai_api_key")
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 3850)))
